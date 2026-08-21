@@ -43,8 +43,10 @@ export default defineConfig({
     screenshot: 'on',
     headless:true,
     launchOptions: {
-    slowMo: 3000, // 3 second delay between actions,
-    args:['--start-minimized'] ,
+    // slowMo is only useful for local debugging; keep it off in CI so tests
+    // don't creep close to the test timeout, and drop --start-minimized —
+    // it's a Chromium-only flag and WebKit fails to launch when it sees it.
+    slowMo: process.env.CI ? 0 : 1000,
   },
   
   },
