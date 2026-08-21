@@ -61,6 +61,8 @@ jobs:
     needs: test
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # required so GITHUB_TOKEN can push the gh-pages branch
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

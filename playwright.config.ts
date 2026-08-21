@@ -20,8 +20,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers:2,
+  /* GitHub-hosted runners only have 2 CPU cores; 1 worker avoids resource
+     contention that causes intermittent slow-page/timeout flakiness in CI. */
+  workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   
   reporter: [
@@ -42,6 +43,11 @@ export default defineConfig({
     video: 'on',
     screenshot: 'on',
     headless:true,
+    /* Individual click/fill/etc. actions get their own timeout, separate
+       from the whole-test 60s budget — protects against one slow network
+       hop from eating the entire test's time. */
+    actionTimeout: 15 * 1000,
+    navigationTimeout: 30 * 1000,
     launchOptions: {
     // slowMo is only useful for local debugging; keep it off in CI so tests
     // don't creep close to the test timeout, and drop --start-minimized —
